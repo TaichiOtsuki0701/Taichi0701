@@ -2,22 +2,24 @@ package model.entity;
 
 public class CategoryBean {
 
-		private int id;
-		private String name;
-		public int getId() {
-			return id;
-		}
-		public void setId(int id) {
-			this.id = id;
-		}
-		public String getName() {
-			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
-		}
+	private int categoryId;
+	private String categoryName;
 
-
-		
+	public int getCategoryId() {
+		return categoryId;
 	}
 
+	public void setCategoryId(int category_id) {
+		this.categoryId = category_id;
+
+	}
+
+	public String getCategoryName() {
+		return categoryName;
+	}
+
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
+	}
+
+}

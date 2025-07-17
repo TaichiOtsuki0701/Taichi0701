@@ -7,41 +7,50 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.entity.CategoryBean; // CategoryBeanをインポート
 import model.entity.ProductBean;
 
 public class ProductDAO {
-    private Connection connection;
 	public boolean registerProduct(ProductBean product) throws SQLException {
-        String sql = "INSERT INTO products(name, price, stock, categoryId) VALUES(?,?,?,?)";
+		String sql = "INSERT INTO products(name, price, stock, categoryId) VALUES(?,?,?,?)";
 
-        try (Connection conn = ConnectionManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, product.getName());
-            pstmt.setInt(2, product.getPrice());
-            pstmt.setInt(3, product.getStock());
-            pstmt.setInt(4, product.getCategoryId());
+			pstmt.setString(1, product.getName());
+			pstmt.setInt(2, product.getPrice());
+			pstmt.setInt(3, product.getStock());
+			pstmt.setInt(4, product.getCategoryId());
 
-            int count = pstmt.executeUpdate();
-            return count > 0;
-        }
-    }
+			int count = pstmt.executeUpdate();
+			return count > 0;
+		}
+	}
+
 	public List<ProductBean> getAllProducts() throws SQLException {
-	    List<ProductBean> products = new ArrayList<>();
-	    String sql = "SELECT * FROM products";
-	    
-	    try (Connection conn = ConnectionManager.getConnection();
-	         PreparedStatement statement = conn.prepareStatement(sql);
-	         ResultSet resultSet = statement.executeQuery()) {
-	        while (resultSet.next()) {
-	            ProductBean product = new ProductBean();
-	            product.setName(resultSet.getString("name"));
-	            product.setPrice(resultSet.getInt("price"));
-	            product.setStock(resultSet.getInt("stock"));
-	            product.setCategoryId(resultSet.getInt("categoryId")); 
-	            products.add(product);
-	        }
-	    }
-	    return products;
+		List<ProductBean> products = new ArrayList<>();
+		String sql = "SELECT products.id,products.name,products.price,products.stock,categories.id AS categoryId,categories.category_name AS categoryName"
+				+ "FROM products JOIN categories ON products.categoryId = categories.id";
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement statement = conn.prepareStatement(sql);
+				ResultSet resultSet = statement.executeQuery()) {
+			while (resultSet.next()) {
+				ProductBean product = new ProductBean();
+				product.setId(resultSet.getInt("id"));
+				product.setName(resultSet.getString("name"));
+				product.setPrice(resultSet.getInt("price"));
+				product.setStock(resultSet.getInt("stock"));
+				product.setCategoryId(resultSet.getInt("categoryId"));
+
+				// カテゴリ名もセット
+				CategoryBean category = new CategoryBean();
+				category.setCategoryId(resultSet.getInt("categoryId"));
+				category.setCategoryName(resultSet.getString("categoryName"));
+				product.setCategory(category);
+
+				products.add(product);
+			}
+		}
+		return products;
 	}
 }
