@@ -34,7 +34,6 @@ public class RegistrationServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// リクエストパラメータのエンコーディングを設定
 		request.setCharacterEncoding("UTF-8");
 
 		String name = request.getParameter("name");
@@ -49,7 +48,7 @@ public class RegistrationServlet extends HttpServlet {
 
 		ProductDAO productDAO = new ProductDAO();
 		try {
-			// エラーハンドリング
+
 			if (price < 0 || stock < 0) {
 				request.setAttribute("errorMessage", "価格と在庫数は正の値でなければなりません。");
 				CategoryDAO categoryDAO = new CategoryDAO();
@@ -68,11 +67,11 @@ public class RegistrationServlet extends HttpServlet {
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			request.setAttribute("errorMessage", "価格または在庫数に無効な値が入力されました。");
-			CategoryDAO categoryDAO = new CategoryDAO(); // NumberFormatException時もカテゴリリストを再取得
+			CategoryDAO categoryDAO = new CategoryDAO();
 			try {
 				request.setAttribute("categories", categoryDAO.getAllCategories());
 			} catch (SQLException sqle) {
-				sqle.printStackTrace(); // カテゴリ取得エラーもログに出力
+				sqle.printStackTrace();
 			}
 			RequestDispatcher dispatcher = request.getRequestDispatcher("product_registration.jsp");
 			dispatcher.forward(request, response);
