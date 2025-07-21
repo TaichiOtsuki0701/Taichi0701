@@ -4,7 +4,8 @@
 <title>登録成功</title>
 </head>
 <body>
-	<h2>商品が正常に登録されました！</h2>
-	<a href="ProductServlet">商品一覧に戻る</a>
+	<h2 style="color: blue;">商品が正常に登録されました！</h2>
+	    <button type="button" class="button-link" onclick="location.href='ProductServlet'">商品登録</button>
+
 </body>
 </html>

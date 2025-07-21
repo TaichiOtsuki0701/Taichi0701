@@ -18,6 +18,20 @@ public class ProductServlet extends HttpServlet {
 		ProductDAO productDAO = new ProductDAO();
 		try {
 			List<ProductBean> products = productDAO.getAllProducts();
+
+			System.out.println("--- ProductServlet: 商品リストのデバッグ ---");
+			System.out.println("取得した商品数: " + products.size());
+			if (products.isEmpty()) {
+				System.out.println("商品リストは空です。");
+			} else {
+				for (ProductBean p : products) {
+					String categoryName = (p.getCategory() != null) ? p.getCategory().getCategoryName() : "カテゴリなし";
+					System.out.println("  商品ID: " + p.getId() + ", 名前: " + p.getName() + ", 価格: " + p.getPrice()
+							+ ", 在庫: " + p.getStock() + ", カテゴリ名: " + categoryName);
+				}
+			}
+			System.out.println("--- デバッグ終了 ---");
+
 			request.setAttribute("products", products);
 			request.getRequestDispatcher("product_home.jsp").forward(request, response);
 		} catch (Exception e) {
@@ -26,4 +40,5 @@ public class ProductServlet extends HttpServlet {
 			request.getRequestDispatcher("error.jsp").forward(request, response);
 		}
 	}
+
 }

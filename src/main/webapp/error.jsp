@@ -4,8 +4,8 @@
 <title>エラー</title>
 </head>
 <body>
-	<h2>エラーが発生しました。</h2>
+	<h2 style="color: red;" >エラーが発生しました。</h2>
 	<p>しばらくしてから再度お試しください。</p>
-	<a href="ProductServlet">商品一覧に戻る</a>
+    <button type="button" class="button-link" onclick="location.href='ProductServlet'">商品登録</button>
 </body>
 </html>

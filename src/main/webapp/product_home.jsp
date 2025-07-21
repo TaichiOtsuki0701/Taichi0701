@@ -7,7 +7,8 @@
 </head>
 <body>
 	<h1>商品一覧</h1>
-	<a href="RegistrationServlet">商品登録</a>
+	<button type="button" class="button-link"
+		onclick="location.href='RegistrationServlet'">商品登録</button>
 	<table border="1">
 		<tr>
 			<th>商品名</th>
@@ -20,7 +21,7 @@
 				<td>${product.name}</td>
 				<td>${product.price}</td>
 				<td>${product.stock}</td>
-				<td>${product.category.name}</td>
+				<td>${product.category.categoryName}</td>
 			</tr>
 		</c:forEach>
 	</table>

@@ -7,12 +7,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.entity.CategoryBean; // CategoryBeanをインポート
+import model.entity.CategoryBean;
 import model.entity.ProductBean;
 
 public class ProductDAO {
 	public boolean registerProduct(ProductBean product) throws SQLException {
-		String sql = "INSERT INTO products(name, price, stock, categoryId) VALUES(?,?,?,?)";
+		String sql = "INSERT INTO products(name, price, stock, category_id) VALUES(?,?,?,?)";
 
 		try (Connection conn = ConnectionManager.getConnection();
 				PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -29,8 +29,9 @@ public class ProductDAO {
 
 	public List<ProductBean> getAllProducts() throws SQLException {
 		List<ProductBean> products = new ArrayList<>();
-		String sql = "SELECT products.id,products.name,products.price,products.stock,categories.id AS categoryId,categories.category_name AS categoryName"
-				+ "FROM products JOIN categories ON products.categoryId = categories.id";
+		String sql = "SELECT products.id, products.name, products.price, products.stock, "
+				+ "categories.id AS categoryId, categories.category_name AS categoryName "
+				+ "FROM products JOIN categories ON products.category_id = categories.id";
 		try (Connection conn = ConnectionManager.getConnection();
 				PreparedStatement statement = conn.prepareStatement(sql);
 				ResultSet resultSet = statement.executeQuery()) {
@@ -42,7 +43,6 @@ public class ProductDAO {
 				product.setStock(resultSet.getInt("stock"));
 				product.setCategoryId(resultSet.getInt("categoryId"));
 
-				// カテゴリ名もセット
 				CategoryBean category = new CategoryBean();
 				category.setCategoryId(resultSet.getInt("categoryId"));
 				category.setCategoryName(resultSet.getString("categoryName"));
