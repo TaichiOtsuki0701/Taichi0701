@@ -5,7 +5,8 @@
 </head>
 <body>
 	<h2 style="color: blue;">商品が正常に登録されました！</h2>
-	    <button type="button" class="button-link" onclick="location.href='ProductServlet'">商品登録</button>
+	<button type="button" class="button-link"
+		onclick="location.href='ProductServlet'">商品登録</button>
 
 </body>
 </html>
