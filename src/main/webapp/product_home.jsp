@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,6 +17,7 @@
 			<th>価格</th>
 			<th>在庫数</th>
 			<th>カテゴリ名</th>
+			<th>削除</th>
 		</tr>
 		<c:forEach var="product" items="${products}">
 			<tr>
@@ -22,6 +25,13 @@
 				<td>${product.price}</td>
 				<td>${product.stock}</td>
 				<td>${product.category.categoryName}</td>
+				<td>
+					<form action="DeleteServlet" method="post" style="display: inline;">
+						<input type="hidden" name="id" value="${product.id}">
+						<button type="submit" class="btn btn-danger"
+							onclick="return confirm('本当に削除しますか？');">削除</button>
+					</form>
+				</td>
 			</tr>
 		</c:forEach>
 	</table>

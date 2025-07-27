@@ -7,6 +7,6 @@
 	<h2 style="color: red;">エラーが発生しました。</h2>
 	<p>しばらくしてから再度お試しください。</p>
 	<button type="button" class="button-link"
-		onclick="location.href='ProductServlet'">商品一覧に戻る</button>
+		onclick="location.href='ProductListServlet'">商品一覧に戻る</button>
 </body>
 </html>
