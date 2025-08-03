@@ -58,7 +58,7 @@ public class RegistrationServlet extends HttpServlet {
 				return;
 			}
 			productDAO.registerProduct(product);
-			response.sendRedirect("success.jsp"); // 成功ページにリダイレクト
+			response.sendRedirect("registration_success.jsp"); // 成功ページにリダイレクト
 		} catch (SQLException e) {
 			e.printStackTrace();
 			request.setAttribute("errorMessage", "商品の登録に失敗しました。データベースエラー: " + e.getMessage());

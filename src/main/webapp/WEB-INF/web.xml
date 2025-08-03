@@ -30,7 +30,14 @@
 		<servlet-name>DeleteServlet</servlet-name>
 		<url-pattern>/DeleteServlet</url-pattern>
 	</servlet-mapping>
-
+ <servlet>
+        <servlet-name>UpdateServlet</servlet-name>
+        <servlet-class>servlet.UpdateServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UpdateServlet</servlet-name>
+        <url-pattern>/UpdateServlet</url-pattern>
+    </servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>ProductListServlet</welcome-file>
 	</welcome-file-list>

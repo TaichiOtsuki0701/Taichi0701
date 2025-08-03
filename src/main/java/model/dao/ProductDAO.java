@@ -92,5 +92,25 @@ public class ProductDAO {
 			int affectedRows = pstmt.executeUpdate();
 			return affectedRows > 0;
 		}
+	
 	}
+	public boolean updateProduct(ProductBean product) throws SQLException{
+		String sql="UPDATE products SET name = ?, price = ?, stock = ?, category_id = ? WHERE id = ?";
+		
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			
+			pstmt.setString(1, product.getName());
+			pstmt.setInt(2, product.getPrice());
+			pstmt.setInt(3, product.getStock());
+			pstmt.setInt(4, product.getCategoryId());
+			pstmt.setInt(5, product.getId());
+			
+
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0; 
+		}
+		
+
+}
 }
