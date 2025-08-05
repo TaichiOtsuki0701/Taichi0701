@@ -1,22 +1,22 @@
 package servlet;
 
 import java.io.IOException;
-import java.net.URLEncoder; // URLEncoderをインポート
-import java.sql.SQLException;
+import java.net.URLEncoder;
+import java.sql.SQLException; // Connection, PreparedStatement, ResultSet のインポートは不要になる
+import java.util.List; // List は必要
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+// model.dao.ConnectionManager のインポートは不要になる（DAOがラップするため）
+import model.dao.CategoryDAO; // CategoryDAO は必要
 import model.dao.ProductDAO;
+import model.entity.CategoryBean;
 import model.entity.ProductBean;
-// CategoryDAO, CategoryBean のインポートは doGet でカテゴリリストを渡す場合のみ必要
-// import model.dao.CategoryDAO;
-// import model.entity.CategoryBean;
 
-
-// @WebServletアノテーションでURLマッピング (web.xmlで設定する場合はコメントアウトのまま)
+// @WebServletアノテーションでURLマッピング
 public class UpdateServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -36,22 +36,23 @@ public class UpdateServlet extends HttpServlet {
             return;
         }
 
-        ProductDAO productDAO = new ProductDAO();
+        ProductDAO productDAO = new ProductDAO(); // DAOインスタンス化
         ProductBean product = null;
+        List<CategoryBean> categories = null;
 
         try {
+            // --- ここで DAO の getProductById を呼び出す ---
             product = productDAO.getProductById(id);
+            // --- ここまで ---
+
+            // カテゴリリストを取得 (これはそのまま)
+            CategoryDAO categoryDAO = new CategoryDAO();
+            categories = categoryDAO.getAllCategories();
+            request.setAttribute("categories", categories);
 
             if (product != null) {
                 request.setAttribute("product", product);
-
-                // もしカテゴリリストを動的にJSPで表示するなら、ここでCategoryDAOを使って取得
-                // CategoryDAO categoryDAO = new CategoryDAO();
-                // List<CategoryBean> categories = categoryDAO.getAllCategories();
-                // request.setAttribute("categories", categories);
-
-                // ここで JSP のパスを確認し、必要であれば変更
-                RequestDispatcher dispatcher = request.getRequestDispatcher("product_update.jsp"); // または "product_update.jsp"
+                RequestDispatcher dispatcher = request.getRequestDispatcher("product_update.jsp");
                 dispatcher.forward(request, response);
             } else {
                 request.setAttribute("errorMessage", "指定された商品が見つかりませんでした。");
@@ -66,6 +67,7 @@ public class UpdateServlet extends HttpServlet {
         }
     }
 
+    // 商品情報の更新処理 (POSTリクエスト)
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html; charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
@@ -84,7 +86,27 @@ public class UpdateServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "入力値が不正です。数値項目には数値を入力してください。");
-            RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
+            
+            // エラー時にカテゴリリストと既存商品情報（ユーザーが入力した値）をJSPに戻す
+            // ProductBeanにはCategoryBeanもセットする必要がある（getCategoryNameのため）
+            ProductBean currentProduct = new ProductBean();
+            CategoryDAO categoryDAO = new CategoryDAO();
+            try {
+                List<CategoryBean> categories = categoryDAO.getAllCategories();
+                // 選択されたカテゴリをProductBeanにセット
+                for(CategoryBean cat : categories) {
+                    if (cat.getCategoryId() == categoryId) {
+                        currentProduct.setCategory(cat);
+                        break;
+                    }
+                }
+                request.setAttribute("categories", categories);
+            } catch (SQLException sqle) {
+                sqle.printStackTrace();
+            }
+            request.setAttribute("product", currentProduct); // 再構築したproductをセット
+            
+            RequestDispatcher dispatcher = request.getRequestDispatcher("product_update.jsp");
             dispatcher.forward(request, response);
             return;
         }
@@ -96,26 +118,61 @@ public class UpdateServlet extends HttpServlet {
         product.setStock(stock);
         product.setCategoryId(categoryId);
      
-
         ProductDAO productDAO = new ProductDAO();
 
         try {
             boolean updated = productDAO.updateProduct(product);
 
             if (updated) {
-                // 更新成功後、update_success.jsp にリダイレクトし、更新した商品名を渡す
-                String encodedProductName = URLEncoder.encode(name, "UTF-8"); // 更新した商品名を使用
+                String encodedProductName = URLEncoder.encode(name, "UTF-8");
                 response.sendRedirect("update_success.jsp?name=" + encodedProductName);
             } else {
-                // 更新失敗（IDが見つからないなど）
                 request.setAttribute("errorMessage", "商品の更新に失敗しました。指定された商品が見つからない可能性があります。");
-                RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
+                
+                // 失敗時もカテゴリリストと既存商品情報（ユーザーが入力した値）をJSPに戻す
+                // ProductBeanにはCategoryBeanもセットする必要がある
+                CategoryDAO categoryDAO = new CategoryDAO();
+                try {
+                    List<CategoryBean> categories = categoryDAO.getAllCategories();
+                    // 選択されたカテゴリをProductBeanにセット
+                    for(CategoryBean cat : categories) {
+                        if (cat.getCategoryId() == categoryId) {
+                            product.setCategory(cat); // 既存のproductオブジェクトにセット
+                            break;
+                        }
+                    }
+                    request.setAttribute("categories", categories);
+                } catch (SQLException sqle) {
+                    sqle.printStackTrace();
+                }
+                request.setAttribute("product", product);
+
+                RequestDispatcher dispatcher = request.getRequestDispatcher("product_update.jsp");
                 dispatcher.forward(request, response);
             }
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "商品の更新中にデータベースエラーが発生しました: " + e.getMessage());
-            RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
+            
+            // DBエラー時もカテゴリリストと既存商品情報（ユーザーが入力した値）をJSPに戻す
+            // ProductBeanにはCategoryBeanもセットする必要がある
+            CategoryDAO categoryDAO = new CategoryDAO();
+            try {
+                List<CategoryBean> categories = categoryDAO.getAllCategories();
+                // 選択されたカテゴリをProductBeanにセット
+                for(CategoryBean cat : categories) {
+                    if (cat.getCategoryId() == categoryId) {
+                        product.setCategory(cat); // 既存のproductオブジェクトにセット
+                        break;
+                    }
+                }
+                request.setAttribute("categories", categories);
+            } catch (SQLException sqle) {
+                sqle.printStackTrace();
+            }
+            request.setAttribute("product", product);
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher("product_update.jsp");
             dispatcher.forward(request, response);
         }
     }

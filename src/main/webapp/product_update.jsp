@@ -32,14 +32,14 @@
                 <label for="stock" class="form-label">在庫数</label>
                 <input type="number" class="form-control" id="stock" name="stock" value="${product.stock}" required>
             </div>
-            <div class="mb-3">
-                <label for="category" class="form-label">カテゴリ</label>
-                <select class="form-select" id="category" name="categoryId" required> <%-- name="categoryId" --%>
-                  
-                    <option value="1" <c:if test="${product.category.categoryId == 1}">selected</c:if>>食品</option>
-                    <option value="2" <c:if test="${product.category.categoryId == 2}">selected</c:if>>家電</option>
-                    <option value="3" <c:if test="${product.category.categoryId == 3}">selected</c:if>>書籍</option>
-                    <option value="4" <c:if test="${product.category.categoryId == 4}">selected</c:if>>その他</option>
+             <div class="mb-3">
+                <label for="categoryId" class="form-label">カテゴリ</label> <%-- labelのforとselectのidを'categoryId'に統一 --%>
+                <select class="form-select" id="categoryId" name="categoryId" required>
+                    <c:forEach var="category" items="${categories}">
+                        <option value="${category.categoryId}"
+                           
+                         ${category.categoryId == param.categoryId ? 'selected' : ''}>${category.categoryName}</option>
+                    </c:forEach>
                 </select>
             </div>
 

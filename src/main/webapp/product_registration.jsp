@@ -19,7 +19,7 @@
         </c:if>
 
         <form action="RegistrationServlet" method="post">
-            <div class="mb-3"> <%-- 各フォームグループにマージンを追加 --%>
+            <div class="mb-3">
                 <label for="name" class="form-label">商品名</label> <%-- ラベルにBootstrapクラス --%>
                 <input type="text" class="form-control" id="name" name="name" required value="${param.name}"> <%-- inputにBootstrapクラスとid --%>
             </div>
@@ -33,7 +33,7 @@
             </div>
             <div class="mb-3">
                 <label for="categoryId" class="form-label">カテゴリ</label> <%-- ラベルにBootstrapクラス --%>
-                <select class="form-select" id="categoryId" name="categoryId" required> <%-- selectにBootstrapクラスとid --%>
+                <select class="form-select" id="categoryId" name="categoryId" required>
                     <c:forEach var="category" items="${categories}">
                         <option value="${category.categoryId}"
                             ${category.categoryId == param.categoryId ? 'selected' : ''}>${category.categoryName}</option>
