@@ -58,11 +58,11 @@ public class RegistrationServlet extends HttpServlet {
 				return;
 			}
 			productDAO.registerProduct(product);
-			response.sendRedirect("registration_success.jsp"); // 成功ページにリダイレクト
+			response.sendRedirect("registration_success.jsp");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			request.setAttribute("errorMessage", "商品の登録に失敗しました。データベースエラー: " + e.getMessage());
-			RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp"); // error.jspに転送
+			RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp"); 
 			dispatcher.forward(request, response);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
