@@ -118,7 +118,24 @@ public class UpdateServlet extends HttpServlet {
 
 			if (updated) {
 				String encodedProductName = URLEncoder.encode(name, "UTF-8");
-				response.sendRedirect("update_success.jsp?name=" + encodedProductName);
+				String encodedCategoryName = "";
+				CategoryDAO categoryDAO = new CategoryDAO();
+				try {
+					List<CategoryBean> categories = categoryDAO.getAllCategories();
+					for (CategoryBean cat : categories) {
+						if (cat.getCategoryId() == categoryId) {
+							encodedCategoryName = URLEncoder.encode(cat.getCategoryName(), "UTF-8");
+							break;
+						}
+					}
+				} catch (SQLException sqle) {
+					sqle.printStackTrace();
+				}
+				response.sendRedirect("update_success.jsp?name=" + encodedProductName +
+						"&price=" + price +
+						"&stock=" + stock +
+						"&categoryId=" + categoryId +
+						"&categoryName=" + encodedCategoryName);
 			} else {
 				request.setAttribute("errorMessage", "商品の更新に失敗しました。指定された商品が見つからない可能性があります。");
 

@@ -22,9 +22,9 @@
 
 		<form action="RegistrationServlet" method="post">
 			<div class="mb-3">
-				<label for="name" class="form-label">商品名</label>
-				<input type="text" class="form-control" id="name" name="name"
-					required value="${param.name}">
+				<label for="name" class="form-label">商品名</label> <input type="text"
+					class="form-control" id="name" name="name" required
+					value="${param.name}">
 			</div>
 			<div class="mb-3">
 				<label for="price" class="form-label">価格</label> <input
@@ -37,9 +37,8 @@
 					value="${param.stock}">
 			</div>
 			<div class="mb-3">
-				<label for="categoryId" class="form-label">カテゴリ</label>
-				<select class="form-select" id="categoryId" name="categoryId"
-					required>
+				<label for="categoryId" class="form-label">カテゴリ</label> <select
+					class="form-select" id="categoryId" name="categoryId" required>
 					<c:forEach var="category" items="${categories}">
 						<option value="${category.categoryId}"
 							${category.categoryId == param.categoryId ? 'selected' : ''}>${category.categoryName}</option>
@@ -47,7 +46,7 @@
 				</select>
 			</div>
 
-			<button type="submit" class="btn btn-primary me-2">登録</button>
+			<button type="submit" class="btn btn-primary me-2">登録する</button>
 			<button type="button" class="btn btn-secondary"
 				onclick="location.href='ProductListServlet'">商品一覧に戻る</button>
 		</form>

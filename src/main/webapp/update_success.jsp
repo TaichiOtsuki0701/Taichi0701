@@ -17,10 +17,15 @@
 		<h2 class="mb-4">商品編集完了</h2>
 
 		<div class="alert alert-success" role="alert">
-			商品「
-			<c:out value="${param.name }" />
-			」を編集しました。
-
+			<h5 class="alert-heading">更新された内容</h5>
+			<ul>
+				<li>商品名: <c:out value="${param.name}" /></li>
+				<li>価格: <c:out value="${param.price}" />円
+				</li>
+				<li>在庫数: <c:out value="${param.stock}" />個
+				</li>
+				<li>カテゴリ名: <c:out value="${param.categoryName}" /></li>
+			</ul>
 		</div>
 		<a href="ProductListServlet" class="btn btn-primary">商品一覧へ戻る</a>
 	</div>

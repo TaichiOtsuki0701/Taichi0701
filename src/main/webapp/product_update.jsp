@@ -48,7 +48,7 @@
 				</select>
 			</div>
 
-			<button type="submit" class="btn btn-primary">更新</button>
+			<button type="submit" class="btn btn-primary">更新する</button>
 			<button type="button" class="btn btn-secondary"
 				onclick="location.href='ProductListServlet'">商品一覧に戻る</button>
 		</form>

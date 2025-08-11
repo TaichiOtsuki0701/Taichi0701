@@ -62,7 +62,7 @@ public class RegistrationServlet extends HttpServlet {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			request.setAttribute("errorMessage", "商品の登録に失敗しました。データベースエラー: " + e.getMessage());
-			RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp"); 
+			RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
 			dispatcher.forward(request, response);
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
