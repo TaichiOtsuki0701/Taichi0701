@@ -37,43 +37,74 @@ public class RegistrationServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 
 		String name = request.getParameter("name");
-		int price = Integer.parseInt(request.getParameter("price"));
-		int stock = Integer.parseInt(request.getParameter("stock"));
-		int categoryId = Integer.parseInt(request.getParameter("categoryId"));
-		ProductBean product = new ProductBean();
-		product.setName(name);
-		product.setPrice(price);
-		product.setStock(stock);
-		product.setCategoryId(categoryId);
+		int price = 0;
+		int stock = 0;
+		int categoryId = 0;
 
-		ProductDAO productDAO = new ProductDAO();
+		ProductBean currentProduct = new ProductBean();
+
 		try {
+			price = Integer.parseInt(request.getParameter("price"));
+			stock = Integer.parseInt(request.getParameter("stock"));
+			categoryId = Integer.parseInt(request.getParameter("categoryId"));
 
-			if (price < 0 || stock < 0) {
-				request.setAttribute("errorMessage", "価格と在庫数は正の値でなければなりません。");
+			currentProduct.setName(name);
+			currentProduct.setPrice(price);
+			currentProduct.setStock(stock);
+			currentProduct.setCategoryId(categoryId);
+
+			if (price < 1 || stock < 0) {
+				String errorMessage = "";
+				if (price < 1) {
+					errorMessage += "価格は1以上の値を入力してください。";
+				}
+				if (stock < 0) {
+					if (!errorMessage.isEmpty()) {
+						errorMessage += " ";
+					}
+					errorMessage += "在庫数は0以上の値を入力してください。";
+				}
+
+				request.setAttribute("errorMessage", errorMessage);
+
 				CategoryDAO categoryDAO = new CategoryDAO();
 				request.setAttribute("categories", categoryDAO.getAllCategories());
+				request.setAttribute("product", currentProduct); // 入力値をJSPに戻す
+
 				RequestDispatcher dispatcher = request.getRequestDispatcher("product_registration.jsp");
 				dispatcher.forward(request, response);
 				return;
 			}
-			productDAO.registerProduct(product);
+			ProductDAO productDAO = new ProductDAO();
+			productDAO.registerProduct(currentProduct);
 			response.sendRedirect("registration_success.jsp");
-		} catch (SQLException e) {
-			e.printStackTrace();
-			request.setAttribute("errorMessage", "商品の登録に失敗しました。データベースエラー: " + e.getMessage());
-			RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
-			dispatcher.forward(request, response);
+
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
-			request.setAttribute("errorMessage", "価格または在庫数に無効な値が入力されました。");
+			request.setAttribute("errorMessage", "入力値が不正です。数値項目には数値を入力してください。");
+
+			currentProduct.setName(name);
+			try {
+				categoryId = Integer.parseInt(request.getParameter("categoryId"));
+				currentProduct.setCategoryId(categoryId);
+			} catch (NumberFormatException nfe) {
+			}
+
 			CategoryDAO categoryDAO = new CategoryDAO();
 			try {
 				request.setAttribute("categories", categoryDAO.getAllCategories());
 			} catch (SQLException sqle) {
 				sqle.printStackTrace();
 			}
+			request.setAttribute("product", currentProduct);
+
 			RequestDispatcher dispatcher = request.getRequestDispatcher("product_registration.jsp");
+			dispatcher.forward(request, response);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			request.setAttribute("errorMessage", "商品の登録に失敗しました。データベースエラー: " + e.getMessage());
+			RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
 			dispatcher.forward(request, response);
 		}
 	}

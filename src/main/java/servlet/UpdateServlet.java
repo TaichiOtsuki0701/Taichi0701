@@ -2,16 +2,15 @@ package servlet;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.sql.SQLException; // Connection, PreparedStatement, ResultSet のインポートは不要になる
-import java.util.List; // List は必要
+import java.sql.SQLException;
+import java.util.List;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-// model.dao.ConnectionManager のインポートは不要になる（DAOがラップするため）
-import model.dao.CategoryDAO; // CategoryDAO は必要
+import model.dao.CategoryDAO;
 import model.dao.ProductDAO;
 import model.entity.CategoryBean;
 import model.entity.ProductBean;
@@ -74,21 +73,66 @@ public class UpdateServlet extends HttpServlet {
 		int stock = 0;
 		int categoryId = 0;
 
+		ProductBean currentProduct = new ProductBean();
+
 		try {
 			id = Integer.parseInt(request.getParameter("id"));
 			price = Integer.parseInt(request.getParameter("price"));
 			stock = Integer.parseInt(request.getParameter("stock"));
 			categoryId = Integer.parseInt(request.getParameter("categoryId"));
+
+			currentProduct.setId(id);
+			currentProduct.setName(name);
+			currentProduct.setPrice(price);
+			currentProduct.setStock(stock);
+			currentProduct.setCategoryId(categoryId);
+
+			if (price < 1 || stock < 0) {
+				StringBuilder errorMessage = new StringBuilder();
+				if (price < 1) {
+					errorMessage.append("価格は1以上の値を入力してください。");
+				}
+				if (stock < 0) {
+					if (errorMessage.length() > 0) {
+						errorMessage.append(" ");
+					}
+					errorMessage.append("在庫数は0以上の値を入力してください。");
+				}
+
+				request.setAttribute("errorMessage", errorMessage.toString());
+
+				CategoryDAO categoryDAO = new CategoryDAO();
+				List<CategoryBean> categories = categoryDAO.getAllCategories();
+				for (CategoryBean cat : categories) {
+					if (cat.getCategoryId() == categoryId) {
+						currentProduct.setCategory(cat);
+						break;
+					}
+				}
+				request.setAttribute("categories", categories);
+				request.setAttribute("product", currentProduct);
+
+				RequestDispatcher dispatcher = request.getRequestDispatcher("product_update.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 			request.setAttribute("errorMessage", "入力値が不正です。数値項目には数値を入力してください。");
 
-			ProductBean currentProduct = new ProductBean();
+			currentProduct.setName(name);
+			try {
+				categoryId = Integer.parseInt(request.getParameter("categoryId"));
+				currentProduct.setCategoryId(categoryId);
+			} catch (NumberFormatException nfe) {
+			}
+
 			CategoryDAO categoryDAO = new CategoryDAO();
 			try {
 				List<CategoryBean> categories = categoryDAO.getAllCategories();
 				for (CategoryBean cat : categories) {
-					if (cat.getCategoryId() == categoryId) {
+					if (cat.getCategoryId() == currentProduct.getCategoryId()) {
 						currentProduct.setCategory(cat);
 						break;
 					}
@@ -100,6 +144,12 @@ public class UpdateServlet extends HttpServlet {
 			request.setAttribute("product", currentProduct);
 
 			RequestDispatcher dispatcher = request.getRequestDispatcher("product_update.jsp");
+			dispatcher.forward(request, response);
+			return;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			request.setAttribute("errorMessage", "データベースからのカテゴリ取得に失敗しました。");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
 			dispatcher.forward(request, response);
 			return;
 		}
@@ -120,16 +170,12 @@ public class UpdateServlet extends HttpServlet {
 				String encodedProductName = URLEncoder.encode(name, "UTF-8");
 				String encodedCategoryName = "";
 				CategoryDAO categoryDAO = new CategoryDAO();
-				try {
-					List<CategoryBean> categories = categoryDAO.getAllCategories();
-					for (CategoryBean cat : categories) {
-						if (cat.getCategoryId() == categoryId) {
-							encodedCategoryName = URLEncoder.encode(cat.getCategoryName(), "UTF-8");
-							break;
-						}
+				List<CategoryBean> categories = categoryDAO.getAllCategories();
+				for (CategoryBean cat : categories) {
+					if (cat.getCategoryId() == categoryId) {
+						encodedCategoryName = URLEncoder.encode(cat.getCategoryName(), "UTF-8");
+						break;
 					}
-				} catch (SQLException sqle) {
-					sqle.printStackTrace();
 				}
 				response.sendRedirect("update_success.jsp?name=" + encodedProductName +
 						"&price=" + price +
@@ -140,18 +186,14 @@ public class UpdateServlet extends HttpServlet {
 				request.setAttribute("errorMessage", "商品の更新に失敗しました。指定された商品が見つからない可能性があります。");
 
 				CategoryDAO categoryDAO = new CategoryDAO();
-				try {
-					List<CategoryBean> categories = categoryDAO.getAllCategories();
-					for (CategoryBean cat : categories) {
-						if (cat.getCategoryId() == categoryId) {
-							product.setCategory(cat);
-							break;
-						}
+				List<CategoryBean> categories = categoryDAO.getAllCategories();
+				for (CategoryBean cat : categories) {
+					if (cat.getCategoryId() == categoryId) {
+						product.setCategory(cat);
+						break;
 					}
-					request.setAttribute("categories", categories);
-				} catch (SQLException sqle) {
-					sqle.printStackTrace();
 				}
+				request.setAttribute("categories", categories);
 				request.setAttribute("product", product);
 
 				RequestDispatcher dispatcher = request.getRequestDispatcher("product_update.jsp");
