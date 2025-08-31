@@ -26,4 +26,24 @@ public class CategoryDAO {
 		}
 		return categories;
 	}
+
+	public CategoryBean getCategoryById(int id) throws SQLException {
+		CategoryBean category = null;
+		String sql = "SELECT * FROM categories WHERE id = ?";
+
+		try (Connection conn = ConnectionManager.getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			pstmt.setInt(1, id);
+
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					category = new CategoryBean();
+					category.setCategoryId(rs.getInt("id"));
+					category.setCategoryName(rs.getString("category_name"));
+				}
+			}
+		}
+		return category;
+	}
 }

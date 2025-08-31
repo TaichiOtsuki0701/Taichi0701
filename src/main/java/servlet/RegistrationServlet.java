@@ -69,15 +69,29 @@ public class RegistrationServlet extends HttpServlet {
 
 				CategoryDAO categoryDAO = new CategoryDAO();
 				request.setAttribute("categories", categoryDAO.getAllCategories());
-				request.setAttribute("product", currentProduct); // 入力値をJSPに戻す
+				request.setAttribute("product", currentProduct);
 
 				RequestDispatcher dispatcher = request.getRequestDispatcher("product_registration.jsp");
 				dispatcher.forward(request, response);
 				return;
 			}
 			ProductDAO productDAO = new ProductDAO();
-			productDAO.registerProduct(currentProduct);
-			response.sendRedirect("registration_success.jsp");
+			boolean registered = productDAO.registerProduct(currentProduct);
+
+			if (registered) {
+				CategoryDAO categoryDAO = new CategoryDAO();
+				CategoryBean category = categoryDAO.getCategoryById(categoryId);
+				currentProduct.setCategory(category);
+
+				request.setAttribute("product", currentProduct);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("registration_success.jsp");
+				dispatcher.forward(request, response);
+			} else {
+
+				request.setAttribute("errorMessage", "商品の登録に失敗しました。");
+				RequestDispatcher dispatcher = request.getRequestDispatcher("error.jsp");
+				dispatcher.forward(request, response);
+			}
 
 		} catch (NumberFormatException e) {
 			e.printStackTrace();

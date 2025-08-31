@@ -11,15 +11,21 @@
 	rel="stylesheet"
 	integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
 	crossorigin="anonymous">
-<style>
-</style>
 </head>
 <body>
+
+	<nav class="navbar navbar-light bg-light">
+		<div class="container-fluid">
+			<div class="d-flex ms-auto">
+				<form action="LogoutServlet" method="post">
+					<button type="submit" class="btn btn-outline-danger">ログアウト</button>
+				</form>
+			</div>
+		</div>
+	</nav>
 	<div class="container mt-4">
 		<h1 class="mb-4">商品一覧</h1>
-
-		<button type="button" class="btn btn-primary mb-3"
-			onclick="location.href='RegistrationServlet'">商品登録</button>
+		<a class="btn btn-outline-primary me-2" href="RegistrationServlet">商品登録</a>
 
 		<table class="table table-striped table-bordered table-hover">
 			<thead class="table-dark">
@@ -59,6 +65,5 @@
 			</tbody>
 		</table>
 	</div>
-
 </body>
 </html>

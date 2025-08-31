@@ -24,6 +24,7 @@ public class UpdateServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 
 		int id = 0;
+
 		try {
 			id = Integer.parseInt(request.getParameter("id"));
 		} catch (NumberFormatException e) {

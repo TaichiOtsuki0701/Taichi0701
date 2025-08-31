@@ -17,14 +17,14 @@ public class LoginDAO {
 	public LoginBean login(String userName, String password) {
 		LoginBean user = null;
 		try {
-			
+
 			Class.forName("com.mysql.cj.jdbc.Driver");
 
 			try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
 				String sql = "SELECT * FROM users WHERE userName = ? AND password = ?";
 				PreparedStatement ps = conn.prepareStatement(sql);
 				ps.setString(1, userName);
-				ps.setString(2, password); 
+				ps.setString(2, password);
 				ResultSet rs = ps.executeQuery();
 
 				if (rs.next()) {
